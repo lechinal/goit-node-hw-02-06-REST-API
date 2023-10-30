@@ -1,25 +1,42 @@
-const express = require('express')
-const logger = require('morgan')
-const cors = require('cors')
+const express = require("express");
+const morgan = require("morgan");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
-const contactsRouter = require('./routes/api/contacts')
+const routerApi = require("./routes/api/index.js");
 
-const app = express()
+const app = express();
 
-const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short'
+dotenv.config();
 
-app.use(logger(formatsLogger))
-app.use(cors())
-app.use(express.json())
+const PORT = process.env.PORT || 5000;
 
-app.use('/api/contacts', contactsRouter)
+const coreOptions = require("./cors");
+app.use(cors(coreOptions));
+app.use(morgan("tiny"));
+app.use(express.json());
 
-app.use((req, res) => {
-  res.status(404).json({ message: 'Not found' })
-})
+app.use("/api", routerApi);
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message })
-})
+app.use((_, res, __) => {
+  res.status(400).json({
+    status: "error",
+    code: 404,
+    message: "The requested route is not available",
+    data: "Not found!",
+  });
+});
 
-module.exports = app
+app.use((err, _, res, __) => {
+  console.log(err.stack);
+  res.status(500).json({
+    status: "fail",
+    code: 500,
+    message: err.message,
+    data: "Internal Server error!",
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running. Use our API on port: ${PORT}`);
+});
