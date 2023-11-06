@@ -2,14 +2,13 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 
 const routerApi = require("./routes/api/index.js");
 
 const app = express();
 
 dotenv.config();
-
-const PORT = process.env.PORT || 5000;
 
 const coreOptions = require("./cors");
 app.use(cors(coreOptions));
@@ -37,6 +36,18 @@ app.use((err, _, res, __) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running. Use our API on port: ${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
+const DB_URL = process.env.DB_URL;
+
+mongoose
+  .connect(DB_URL)
+  .then(() => {
+    console.log("Database connection successful");
+    app.listen(PORT, () => {
+      console.log(`Server is running. Use our API on port: ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(`Database connection error. Error:${err.message}`);
+    process.exit(1);
+  });
