@@ -1,14 +1,5 @@
 const services = require("../services/index.js");
 
-// const {
-//   getAllContacts,
-//   addContact,
-//   getContactById,
-//   removeContact,
-//   updateContact,
-//   updateStatusContact,
-// } = require("../services/index.js");
-
 const get = async (req, res, next) => {
   try {
     const results = await services.getAllContacts();

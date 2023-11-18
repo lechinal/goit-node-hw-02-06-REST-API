@@ -4,18 +4,22 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
-const routerApi = require("./routes/api/index.js");
+dotenv.config();
 
 const app = express();
 
-dotenv.config();
+require("./middlewares/passportConfig.js");
 
+const routerApi = require("./routes/api/index.js");
+const auth = require("./routes/api/auth.js");
 const coreOptions = require("./cors");
+
+app.use(express.json());
 app.use(cors(coreOptions));
 app.use(morgan("tiny"));
-app.use(express.json());
 
 app.use("/api", routerApi);
+app.use("/api/users", auth);
 
 app.use((_, res, __) => {
   res.status(400).json({
@@ -36,13 +40,14 @@ app.use((err, _, res, __) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+// DB connection
+const PORT = process.env.PORT_SERVER || 5000;
 const DB_URL = process.env.DB_URL;
 
 mongoose
   .connect(DB_URL)
   .then(() => {
-    console.log("Database connection successful");
+    console.log("MongoDB connection successful");
     app.listen(PORT, () => {
       console.log(`Server is running. Use our API on port: ${PORT}`);
     });
