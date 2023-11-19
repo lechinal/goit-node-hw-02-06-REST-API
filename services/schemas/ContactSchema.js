@@ -1,9 +1,8 @@
-// definim schemele de la DB meu
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const contact = new Schema({
+const contactSchema = new Schema({
   name: {
     type: String,
     required: [true, "Set name for contact"],
@@ -12,8 +11,12 @@ const contact = new Schema({
   email: { type: String, required: true, minLength: 3 },
   phone: { type: String, required: true, minLength: 5 },
   favorite: { type: Boolean, default: false },
+  owner: {
+    type: Schema.Types.ObjectId,
+    ref: "user",
+  },
 });
 
-const Contact = mongoose.model("contacts", contact);
+const Contact = mongoose.model("contact", contactSchema);
 
 module.exports = Contact;
