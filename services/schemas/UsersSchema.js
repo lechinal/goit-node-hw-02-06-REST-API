@@ -1,6 +1,7 @@
 const mangoose = require("mongoose");
 const { isEmail } = require("validator");
 const bycrypt = require("bcrypt");
+const gravatar = require("gravatar");
 
 const Schema = mangoose.Schema;
 
@@ -26,6 +27,10 @@ const userSchema = new Schema({
     type: String,
     default: null,
   },
+  avatarURL: {
+    type: String,
+    minLength: 2,
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -47,6 +52,17 @@ userSchema.statics.login = async function (email, password) {
   }
   throw Error("incorrect email");
 };
+
+userSchema.pre("save", function (next) {
+  if (!this.avatarURL) {
+    this.avatarURL = gravatar.url(
+      this.email,
+      { s: "250", r: "pg", d: "identicon" },
+      true
+    );
+  }
+  next();
+});
 
 const User = mangoose.model("user", userSchema);
 

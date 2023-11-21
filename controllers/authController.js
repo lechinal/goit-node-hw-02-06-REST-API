@@ -1,6 +1,10 @@
 const User = require("../services/schemas/UsersSchema");
 const jwt = require("jsonwebtoken");
+const Jimp = require("jimp");
+const path = require("path");
+const fs = require("fs");
 
+// const { upload } = require("../routes/api/auth");
 const { successResponse, handleErrors } = require("../helpers/responses");
 
 require("dotenv").config();
@@ -79,6 +83,60 @@ module.exports.usersData_get = async (req, res) => {
   }
 };
 
-module.exports.subscription_patch = (req, res) => {
+/** 
+ * TODO :
+ * module.exports.subscription_patch = (req, res) => {
   res.json({ message: "Subscription updated successfully" });
+};
+ *  
+ */
+
+module.exports.uploadAvatar = async (req, res, next) => {
+  console.log("test");
+
+  try {
+    if (!req.file) {
+      return res.status(404).json({ error: "No file provided!" });
+    }
+
+    // creem un numa unic pt fisierul de avatar folosind id-ul utilizatorului si marcajul de timp
+    const uniqFilename = `${req.user._id}-${Date.now()}${path.extname(
+      req.file.originalname
+    )}`;
+
+    const destinationPath = path.join(
+      __dirname,
+      `../public/avatars/${uniqFilename}`
+    );
+    // definim calea de destinație pentru fișierul final de avatar.
+
+    // folosim Jimp pentru redimensionare, ajustarea calității și transformare în tonuri de gri
+    await Jimp.read(req.file.path)
+      .then((image) => {
+        return image
+          .resize(250, 250)
+          .quality(60)
+          .greyscale()
+          .writeAsync(destinationPath);
+        // writeAsync(destinationPath) salvează în calea de destinație.
+      })
+      // stergem  fișierul original după redimensionare,
+      .then(() => {
+        fs.unlinkSync(req.file.path);
+      })
+      // excepție în caz de eroare în timpul procesării imaginii cu Jimp.
+      .catch((error) => {
+        throw error;
+      });
+
+    // actualizam calea avatarului în obiectul utilizatorului.
+    req.user.avatarURL = `/avatars/${uniqFilename}`;
+    // salvam modificările în obiectul utilizatorului în baza de date.
+    await req.user.save();
+
+    res.status(200).json({ avatarURL: req.user.avatarURL });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+    next(error);
+  }
 };
