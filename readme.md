@@ -9,7 +9,7 @@ Pentru fiecare temă, creează un branch separat.
 - hw02
 - hw03
 - hw04
-- hw05
+- hw05.
 - hw06
 
 Fiecare branch nou pentru fiecare temă trebuie să fie derivat din branch-ul principal (master).
