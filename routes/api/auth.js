@@ -32,6 +32,7 @@ router.get("/logout", auth, authController.logout_get);
 
 router.get("/current", auth, authController.usersData_get);
 
+// avatars
 router.patch(
   "/avatars",
   auth,
@@ -48,4 +49,9 @@ Reînnoirea abonamentului pentru utilizator (subscription) printr-un endpoint PA
  * router.patch("/subscription", auth, authController.subscription_patch);
  *  */
 
+// verify email
+
+router.get("/verify/:verificationToken", authController.verifyEmailController);
+
+router.post("/verify", authController.resendVerificationEmail);
 module.exports = router;
