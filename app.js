@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
 
 dotenv.config();
 
