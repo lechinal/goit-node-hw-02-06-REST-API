@@ -40,13 +40,19 @@ const sendVerificationEmail = async (email, verificationToken) => {
     html: `<p>Click on the following link: <mark><a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click Here</a></mark> to verify your email address!</p>`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log("Email trimis: " + info.response);
-    }
-  });
+  try {
+    const info = transporter.sendMail(mailOptions);
+    console.log("Email send: " + info.response);
+  } catch (error) {
+    console.log("Error sending email:", error);
+  }
+  // transporter.sendMail(mailOptions, (error, info) => {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log("Email trimis: " + info.response);
+  //   }
+  // });
 };
 
 module.exports.signup_post = async (req, res) => {
